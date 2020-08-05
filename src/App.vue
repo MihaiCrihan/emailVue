@@ -1,37 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
+    <div>
+      <b-nav style="background-color: #e0e0e0">
+        <b-img :src="require('./assets/logob.png')" fluid alt="logo"></b-img>
+        <b-nav-item href="#1">Link 1</b-nav-item>
+        <b-nav-item href="#2">Link 2</b-nav-item>
+        <b-nav-text>Plain text</b-nav-text>
+      </b-nav>
+    </div>
 
     <v-content>
       <HelloWorld />
