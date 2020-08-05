@@ -308,6 +308,32 @@ export default {
   computed: {
     isPhone() {
       return this.windowWidth <= 960;
+    },
+    checkStrength() {
+      let strength = 0;
+      if (this.form.password.match(/[a-z]+/)) {
+        strength += 10;
+      }
+      if (this.form.password.match(/[0-9]+/)) {
+        strength += 15;
+      }
+      if (this.form.password.match(/[A-Z]+/)) {
+        strength += 15;
+      }
+      if (
+        this.form.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/)
+      ) {
+        strength = 69;
+      }
+      if (
+        this.form.password.match(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
+        )
+      ) {
+        strength = 100;
+      }
+
+      return strength;
     }
   },
   mounted() {
@@ -318,16 +344,6 @@ export default {
   methods: {
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null;
-    },
-    resetForm() {
-      this.form = {
-        name: null,
-        food: null
-      };
-
-      this.$nextTick(() => {
-        this.$refs.observer.reset();
-      });
     },
     onSubmit() {
       alert("Form submitted!");
@@ -372,7 +388,7 @@ export default {
         </li>
       </ul>
       <div>
-        <div v-if="stepNumber == 1">
+        <div v-if="stepNumber === 1">
           <div class="d-flex mb-4 mt-6">
             <h2>Create your email account</h2>
             <b-icon icon="info" class="info_fade" v-b-toggle="'collapse-1'" />
@@ -397,376 +413,350 @@ export default {
           </b-collapse>
         </div>
         <b-form @submit="onSubmit">
-          <div class="email-field" v-if="stepNumber == 1">
-            <validation-provider
-              name="Name"
-              :rules="{ required: true, min: 3 }"
-              v-slot="validationContext"
-            >
-              <b-form-group
-                id="input-group-1"
-                label-for="input-1"
-                class="email-name"
-              >
-                <b-form-input
-                  id="input-1"
-                  v-model="form.account.username"
-                  trim
-                  type="text"
-                  :state="getValidationState(validationContext)"
-                  placeholder="Enter email"
-                ></b-form-input>
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                  validationContext.errors[0]
-                }}</b-form-invalid-feedback>
-              </b-form-group>
-            </validation-provider>
-            <b-form-group
-              id="input-group-2"
-              label-for="input-2"
-              class="email-domen"
-            >
-              <b-form-select
-                id="input-3"
-                v-model="form.account.domain"
-                :options="domains"
-              ></b-form-select>
-            </b-form-group>
-            <div class="check-button">
-              <b-button class="button">Check</b-button>
-            </div>
-          </div>
-          <div class="personal-details-field" v-if="stepNumber == 2">
-            <h2 class="mt-4">Personal details</h2>
-            <div>
-              <validation-provider
-                name="Gender"
-                :rules="{ required: true, min: 3 }"
-                v-slot="validationContext"
-              >
-                <b-form-group class="gender">
-                  <b-form-radio
-                    v-model="form.gender"
-                    name="female"
-                    :state="getValidationState(validationContext)"
-                    value="f"
-                    class="mr-4"
-                    >Ms</b-form-radio
+          <div v-if="stepNumber === 1">
+            <ValidationObserver v-slot="{ invalid }">
+              <div class="email-field">
+                <validation-provider
+                  name="Name"
+                  :rules="{ required: true, min: 3 }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group
+                    id="input-group-1"
+                    label-for="input-1"
+                    class="email-name"
                   >
-                  <b-form-radio v-model="form.gender" name="male" value="m"
-                    >Mr</b-form-radio
-                  >
-                  <b-form-invalid-feedback id="input-1-live-feedback">{{
-                    validationContext.errors[0]
-                  }}</b-form-invalid-feedback>
+                    <b-form-input
+                      id="input-1"
+                      v-model="form.account.username"
+                      trim
+                      type="text"
+                      :state="getValidationState(validationContext)"
+                      placeholder="Enter email"
+                    ></b-form-input>
+                    <b-form-invalid-feedback id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <b-form-group
+                  id="input-group-2"
+                  label-for="input-2"
+                  class="email-domen"
+                >
+                  <b-form-select
+                    id="input-3"
+                    v-model="form.account.domain"
+                    :options="domains"
+                  ></b-form-select>
                 </b-form-group>
-              </validation-provider>
-            </div>
-            <validation-provider
-              name="first-name"
-              :rules="{ required: true, min: 3 }"
-              v-slot="validationContext"
-            >
-              <b-form-group
-                id="input-group-3"
-                label="First Name:"
-                label-for="input-3"
-              >
-                <b-form-input
-                  id="input-2"
-                  :state="getValidationState(validationContext)"
-                  v-model="form.first_name"
-                  placeholder="Enter name"
-                ></b-form-input>
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                  validationContext.errors[0]
-                }}</b-form-invalid-feedback>
-              </b-form-group>
-            </validation-provider>
-            <validation-provider
-              name="last-name"
-              :rules="{ required: true, min: 3 }"
-              v-slot="validationContext"
-            >
-              <b-form-group
-                id="input-group-4"
-                label="Last Name:"
-                label-for="input-4"
-              >
-                <b-form-input
-                  id="input-2"
-                  :state="getValidationState(validationContext)"
-                  v-model="form.last_name"
-                  placeholder="Enter name"
-                ></b-form-input>
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                  validationContext.errors[0]
-                }}</b-form-invalid-feedback>
-              </b-form-group>
-            </validation-provider>
-            <validation-provider
-              name="country"
-              :rules="{ required: true, min: 3 }"
-              v-slot="validationContext"
-            >
-              <b-form-group
-                id="input-group-6"
-                label="Country"
-                label-for="input-6"
-              >
-                <b-form-select
-                  id="input-3"
-                  :state="getValidationState(validationContext)"
-                  v-model="form.country"
-                  :options="countries"
-                ></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                  validationContext.errors[0]
-                }}</b-form-invalid-feedback>
-              </b-form-group>
-            </validation-provider>
-            <validation-provider
-              name="states"
-              :rules="{ required: true, min: 3 }"
-              v-slot="validationContext"
-            >
-              <b-form-group
-                id="input-group-7"
-                label="State"
-                label-for="input-7"
-              >
-                <b-form-select
-                  id="input-3"
-                  :state="getValidationState(validationContext)"
-                  v-model="form.state"
-                  :options="states"
-                ></b-form-select>
-                <b-form-invalid-feedback id="input-1-live-feedback">{{
-                  validationContext.errors[0]
-                }}</b-form-invalid-feedback>
-              </b-form-group>
-            </validation-provider>
-            <div>
-              <div>Date of birth</div>
-              <b-form inline class="mt-3 birth-date">
-                <validation-provider
-                  name="month"
-                  :rules="{ required: true, min: 3 }"
-                  v-slot="validationContext"
+                <div class="check-button">
+                  <b-button class="button">Check</b-button>
+                </div>
+              </div>
+              <div class="mt-8 d-flex" v-if="isPhone && stepNumber === 1">
+                <b-button
+                  class="ml-auto next-button"
+                  v-if="stepNumber !== 5"
+                  variant="primary"
+                  col
+                  :disabled="invalid"
+                  @click="stepNumber++"
+                  >Next</b-button
                 >
-                  <b-form-group>
-                    <b-input
-                      id="inline-form-input-name"
-                      placeholder="MM"
-                      type="number"
-                      :state="getValidationState(validationContext)"
-                      v-model="form.birth.month"
-                      max="12"
-                      min="1"
-                    ></b-input>
-                    <b-form-invalid-feedback id="input-1-live-feedback">{{
-                      validationContext.errors[0]
-                    }}</b-form-invalid-feedback>
-                  </b-form-group>
-                </validation-provider>
-                <validation-provider
-                  name="day"
-                  :rules="{ required: true, min: 3 }"
-                  v-slot="validationContext"
-                >
-                  <b-form-group>
-                    <b-input
-                      id="inline-form-input-name"
-                      placeholder="DD"
-                      type="number"
-                      :state="getValidationState(validationContext)"
-                      v-model="form.birth.day"
-                      maxlength="2"
-                      min="1"
-                      max="31"
-                    ></b-input>
-                    <b-form-invalid-feedback id="input-1-live-feedback">{{
-                      validationContext.errors[0]
-                    }}</b-form-invalid-feedback>
-                  </b-form-group>
-                </validation-provider>
-                <validation-provider
-                  name="year"
-                  :rules="{ required: true, min: 3 }"
-                  v-slot="validationContext"
-                >
-                  <b-form-group>
-                    <b-input
-                      id="inline-form-input-name"
-                      placeholder="YYYY"
-                      type="number"
-                      :state="getValidationState(validationContext)"
-                      v-model="form.birth.year"
-                      maxlength="4"
-                      min="1900"
-                      max="2020"
-                    ></b-input>
-                    <b-form-invalid-feedback id="input-1-live-feedback">{{
-                      validationContext.errors[0]
-                    }}</b-form-invalid-feedback>
-                  </b-form-group>
-                </validation-provider>
-                <div class="example-input">e.g. 03/16/1997</div>
-              </b-form>
-            </div>
+              </div>
+            </ValidationObserver>
           </div>
-          <div class="password-field" v-if="stepNumber == 3">
-            <div class="d-flex mt-4 mb-5">
-              <h2>Password</h2>
-              <b-icon icon="info" class="info_fade" v-b-toggle="'collapse-2'" />
-            </div>
-            <b-collapse id="collapse-2">
-              <div class="d-flex info-box-animate">
+          <div v-if="stepNumber === 2">
+            <ValidationObserver v-slot="{ invalid }">
+              <div class="personal-details-field">
+                <h2 class="mt-4">Personal details</h2>
                 <div>
-                  Use a unique password for each and every service.
-                  <br />
-                  A secure password consists of
-                  <ul>
-                    <li>At least eight characters</li>
-                    <li>Numbers and letters</li>
-                    <li>Upper and lower case letters</li>
-                    <li>Special characters</li>
-                  </ul>
-                </div>
-                <div class="boxe-close-icon">
-                  <b-icon
-                    icon="x"
-                    class="close-info-box"
-                    style="width: 26px; height: 26px;"
-                    v-b-toggle="'collapse-2'"
-                  />
-                </div>
-              </div>
-            </b-collapse>
-            <div>
-              <validation-provider
-                name="password"
-                :rules="{ required: true, min: 3 }"
-                v-slot="validationContext"
-              >
-                <b-form-group label="Chose a password">
-                  <b-form-input
-                    id="input-2"
-                    v-model="form.password"
-                    required
-                    :state="getValidationState(validationContext)"
-                    type="password"
-                    placeholder="Password"
-                  ></b-form-input>
-                  <b-form-invalid-feedback id="input-1-live-feedback">{{
-                    validationContext.errors[0]
-                  }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-              <div>
-                <b-progress height="5px" class="mt-2" :max="max">
-                  <b-progress-bar :value="value * (1.5 / 1)" variant="danger" />
-                  <b-progress-bar
-                    :value="value * (2.5 / 1)"
-                    variant="warning"
-                  />
-                  <b-progress-bar :value="value * (6 / 1)" variant="success" />
-                </b-progress>
-              </div>
-              <validation-provider
-                name="repeat-password"
-                :rules="{ required: true, min: 3 }"
-                v-slot="validationContext"
-              >
-                <b-form-group label="Repeat a password" class="mt-3">
-                  <b-form-input
-                    id="input-2"
-                    v-model="form.password_repeat"
-                    type="password"
-                    :state="getValidationState(validationContext)"
-                    required
-                  ></b-form-input>
-                  <b-form-invalid-feedback id="input-1-live-feedback">{{
-                    validationContext.errors[0]
-                  }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-            </div>
-          </div>
-          <div class="recovery-password-field" v-if="stepNumber == 4">
-            <div class="d-flex mt-4 mb-5">
-              <h2>Password recovery options</h2>
-              <b-icon icon="info" class="info_fade" v-b-toggle="'collapse-3'" />
-            </div>
-            <b-collapse id="collapse-3">
-              <div class="d-flex info-box-animate">
-                <div>
-                  <div class="mb-2">
-                    Password recovery allows you to reset a forgotten password
-                    yourself by email or SMS. Please add a valid email address.
-                  </div>
-                  <span>
-                    <strong>We guarantee</strong>
-                    your details will exclusively be used to recover your
-                    password or to contact you to secure your account.
-                  </span>
-                </div>
-                <div class="boxe-close-icon">
-                  <b-icon
-                    icon="x"
-                    class="close-info-box"
-                    style="width: 26px; height: 26px;"
-                    v-b-toggle="'collapse-3'"
-                  />
-                </div>
-              </div>
-            </b-collapse>
-            <div class="mt-5 mb-4">
-              <b-form-checkbox
-                id="checkbox-1"
-                name="checkbox-1"
-                value="accepted"
-                @change="showBySms = !showBySms"
-                unchecked-value="not_accepted"
-              >
-                By SMS (recomended)
-              </b-form-checkbox>
-            </div>
-            <div>
-              <div v-if="!showBySms">
-                <div class="mb-2">Cellphone number</div>
-                <div class="email-field">
                   <validation-provider
-                    name="name"
-                    :rules="{ required: true, min: 3 }"
+                    name="Gender"
+                    :rules="{ required: true }"
                     v-slot="validationContext"
                   >
-                    <b-form-group label-for="input-2">
-                      <b-form-select
-                        id="input-3"
-                        v-model="form.recovery.sms.country.name"
-                        :options="names"
+                    <b-form-group class="gender">
+                      <b-form-radio
+                        v-model="form.gender"
+                        name="female"
                         :state="getValidationState(validationContext)"
-                        required
-                      ></b-form-select>
+                        value="f"
+                        class="mr-4"
+                        >Ms</b-form-radio
+                      >
+                      <b-form-radio
+                        :state="getValidationState(validationContext)"
+                        v-model="form.gender"
+                        name="male"
+                        value="m"
+                        >Mr</b-form-radio
+                      >
                       <b-form-invalid-feedback id="input-1-live-feedback">{{
                         validationContext.errors[0]
                       }}</b-form-invalid-feedback>
                     </b-form-group>
                   </validation-provider>
+                </div>
+                <validation-provider
+                  name="first-name"
+                  :rules="{ required: true, min: 3 }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group
+                    id="input-group-3"
+                    label="First Name:"
+                    label-for="input-3"
+                  >
+                    <b-form-input
+                      id="input-2"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.first_name"
+                      placeholder="Enter name"
+                    ></b-form-input>
+                    <b-form-invalid-feedback id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <validation-provider
+                  name="last-name"
+                  :rules="{ required: true, min: 3 }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group
+                    id="input-group-4"
+                    label="Last Name:"
+                    label-for="input-4"
+                  >
+                    <b-form-input
+                      id="input-2"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.last_name"
+                      placeholder="Enter name"
+                    ></b-form-input>
+                    <b-form-invalid-feedback id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <validation-provider
+                  name="country"
+                  :rules="{ required: true }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group
+                    id="input-group-6"
+                    label="Country"
+                    label-for="input-6"
+                  >
+                    <b-form-select
+                      id="input-3"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.country"
+                      :options="countries"
+                    ></b-form-select>
+                    <b-form-invalid-feedback id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <validation-provider
+                  name="states"
+                  :rules="{ required: true }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group
+                    id="input-group-7"
+                    label="State"
+                    label-for="input-7"
+                  >
+                    <b-form-select
+                      id="input-3"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.state"
+                      :options="states"
+                    ></b-form-select>
+                    <b-form-invalid-feedback id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <div>
+                  <div>Date of birth</div>
+                  <b-form inline class="mt-3 birth-date">
+                    <validation-provider
+                      name="month"
+                      :rules="{ required: true, between: [1, 12] }"
+                      v-slot="validationContext"
+                    >
+                      <b-form-group>
+                        <b-input
+                          id="inline-form-input-name"
+                          placeholder="MM"
+                          type="number"
+                          :state="getValidationState(validationContext)"
+                          v-model="form.birth.month"
+                          max="12"
+                          min="1"
+                        ></b-input>
+                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                          validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                      </b-form-group>
+                    </validation-provider>
+                    <validation-provider
+                      name="day"
+                      :rules="{ required: true, between: [1, 31] }"
+                      v-slot="validationContext"
+                    >
+                      <b-form-group>
+                        <b-input
+                          id="inline-form-input-name"
+                          placeholder="DD"
+                          type="number"
+                          :state="getValidationState(validationContext)"
+                          v-model="form.birth.day"
+                          maxlength="2"
+                          min="1"
+                          max="31"
+                        ></b-input>
+                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                          validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                      </b-form-group>
+                    </validation-provider>
+                    <validation-provider
+                      name="year"
+                      :rules="{ required: true, between: [1900, 2020] }"
+                      v-slot="validationContext"
+                    >
+                      <b-form-group>
+                        <b-input
+                          id="inline-form-input-name"
+                          placeholder="YYYY"
+                          type="number"
+                          :state="getValidationState(validationContext)"
+                          v-model="form.birth.year"
+                          maxlength="4"
+                          min="1900"
+                          max="2020"
+                        ></b-input>
+                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                          validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                      </b-form-group>
+                    </validation-provider>
+                    <div class="example-input">e.g. 03/16/1997</div>
+                  </b-form>
+                </div>
+              </div>
+              <div class="mt-8 d-flex" v-if="isPhone">
+                <b-button
+                  @click="stepNumber--"
+                  class="back-button"
+                  variant="link"
+                  >Back</b-button
+                >
+                <b-button
+                  :disabled="invalid"
+                  class="ml-auto next-button"
+                  variant="primary"
+                  col
+                  @click="stepNumber++"
+                  >Next</b-button
+                >
+              </div>
+            </ValidationObserver>
+          </div>
+          <div v-if="stepNumber === 3">
+            <ValidationObserver v-slot="{ invalid }">
+              <div class="password-field">
+                <div class="d-flex mt-4 mb-5">
+                  <h2>Password</h2>
+                  <b-icon
+                    icon="info"
+                    class="info_fade"
+                    v-b-toggle="'collapse-2'"
+                  />
+                </div>
+                <b-collapse id="collapse-2">
+                  <div class="d-flex info-box-animate">
+                    <div>
+                      Use a unique password for each and every service.
+                      <br />
+                      A secure password consists of
+                      <ul>
+                        <li>At least eight characters</li>
+                        <li>Numbers and letters</li>
+                        <li>Upper and lower case letters</li>
+                        <li>Special characters</li>
+                      </ul>
+                    </div>
+                    <div class="boxe-close-icon">
+                      <b-icon
+                        icon="x"
+                        class="close-info-box"
+                        style="width: 26px; height: 26px;"
+                        v-b-toggle="'collapse-2'"
+                      />
+                    </div>
+                  </div>
+                </b-collapse>
+                <div>
                   <validation-provider
-                    name="phone number"
-                    :rules="{ required: true, min: 3 }"
+                    name="password"
+                    vid="confirmation"
+                    :rules="{
+                      required: true,
+                      min: 8,
+                      regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+                    }"
                     v-slot="validationContext"
                   >
-                    <b-form-group label-for="input-1">
+                    <b-form-group label="Chose a password">
                       <b-form-input
-                        id="input-1"
-                        v-model="form.recovery.sms.phone_number"
-                        type="text"
+                        id="input-2"
+                        v-model="form.password"
                         required
                         :state="getValidationState(validationContext)"
-                        placeholder="Enter phone number"
+                        type="password"
+                        placeholder="Password"
+                      ></b-form-input>
+                      <b-form-invalid-feedback id="input-1-live-feedback">{{
+                        validationContext.errors[0]
+                      }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                  <div>
+                    <b-progress height="5px" class="mt-2" :max="max">
+                      <b-progress-bar
+                        :value="checkStrength"
+                        :variant="
+                          checkStrength > 0 && checkStrength < 30
+                            ? 'danger'
+                            : checkStrength > 30 && checkStrength < 70
+                            ? 'warning'
+                            : checkStrength > 70 && checkStrength < 101
+                            ? 'success'
+                            : ''
+                        "
+                      />
+                    </b-progress>
+                  </div>
+                  <validation-provider
+                    name="repeat-password"
+                    rules="confirmed:confirmation"
+                    v-slot="validationContext"
+                  >
+                    <b-form-group label="Repeat a password" class="mt-3">
+                      <b-form-input
+                        id="input-2"
+                        v-model="form.password_repeat"
+                        type="password"
+                        :state="getValidationState(validationContext)"
+                        required
                       ></b-form-input>
                       <b-form-invalid-feedback id="input-1-live-feedback">{{
                         validationContext.errors[0]
@@ -775,123 +765,251 @@ export default {
                   </validation-provider>
                 </div>
               </div>
-              <div class="mt-5 mb-4">
-                <b-form-checkbox
-                  name="checkbox-2"
-                  value="accepted"
-                  unchecked-value="not_accepted"
-                  @change="showByEmail = !showByEmail"
+              <div class="mt-8 d-flex" v-if="isPhone">
+                <b-button
+                  @click="stepNumber--"
+                  class="back-button"
+                  variant="link"
+                  >Back</b-button
                 >
-                  By email
-                </b-form-checkbox>
-              </div>
-              <div v-if="!showByEmail">
-                <validation-provider
-                  name="email"
-                  :rules="{ required: true, min: 3 }"
-                  v-slot="validationContext"
+                <b-button
+                  class="ml-auto next-button"
+                  :disabled="invalid"
+                  variant="primary"
+                  @click="stepNumber++"
+                  col
+                  >Next</b-button
                 >
-                  <b-form-group label="Email address:" label-for="input-1">
-                    <b-form-input
-                      id="input-1"
-                      v-model="form.recovery.email"
-                      type="email"
-                      :state="getValidationState(validationContext)"
-                      required
-                      placeholder="example@mail.ru"
-                    ></b-form-input>
-                    <b-form-invalid-feedback id="input-1-live-feedback">{{
-                      validationContext.errors[0]
-                    }}</b-form-invalid-feedback>
-                  </b-form-group>
-                </validation-provider>
               </div>
-            </div>
+            </ValidationObserver>
           </div>
-          <div class="security-field" v-if="stepNumber == 5">
-            <div class="d-flex mt-4 mb-4">
-              <h2>Security prompt</h2>
-              <b-icon icon="info" class="info_fade" v-b-toggle="'collapse-4'" />
-            </div>
-            <b-collapse id="collapse-4">
-              <div class="d-flex info-box-animate">
-                <div>
-                  Just click the checkbox: If you see a green checkmark,
-                  congratulations! You’ve passed our robot test (yes, it’s that
-                  easy). You can carry on with what you were doing. Sometimes we
-                  need some extra info from you to make sure you’re human and
-                  not a robot, so we ask you to solve a challenge. Simply follow
-                  the on-screen instructions to solve the puzzle and then carry
-                  on with your task.
-                </div>
-                <div class="boxe-close-icon">
+          <div v-if="stepNumber === 4">
+            <ValidationObserver v-slot="{ invalid }">
+              <div class="recovery-password-field">
+                <div class="d-flex mt-4 mb-5">
+                  <h2>Password recovery options</h2>
                   <b-icon
-                    icon="x"
-                    class="close-info-box"
-                    style="width: 26px; height: 26px;"
+                    icon="info"
+                    class="info_fade"
+                    v-b-toggle="'collapse-3'"
+                  />
+                </div>
+                <b-collapse id="collapse-3">
+                  <div class="d-flex info-box-animate">
+                    <div>
+                      <div class="mb-2">
+                        Password recovery allows you to reset a forgotten
+                        password yourself by email or SMS. Please add a valid
+                        email address.
+                      </div>
+                      <span>
+                        <strong>We guarantee</strong>
+                        your details will exclusively be used to recover your
+                        password or to contact you to secure your account.
+                      </span>
+                    </div>
+                    <div class="boxe-close-icon">
+                      <b-icon
+                        icon="x"
+                        class="close-info-box"
+                        style="width: 26px; height: 26px;"
+                        v-b-toggle="'collapse-3'"
+                      />
+                    </div>
+                  </div>
+                </b-collapse>
+                <div class="mt-5 mb-4">
+                  <b-form-checkbox
+                    id="checkbox-1"
+                    name="checkbox-1"
+                    value="accepted"
+                    @change="showBySms = !showBySms"
+                    unchecked-value="not_accepted"
+                  >
+                    By SMS (recomended)
+                  </b-form-checkbox>
+                </div>
+                <div>
+                  <div v-if="!showBySms">
+                    <div class="mb-2">Cellphone number</div>
+                    <div class="email-field">
+                      <validation-provider
+                        name="name"
+                        :rules="{ required: true }"
+                        v-slot="validationContext"
+                      >
+                        <b-form-group label-for="input-2">
+                          <b-form-select
+                            id="input-3"
+                            v-model="form.recovery.sms.country.name"
+                            :options="names"
+                            :state="getValidationState(validationContext)"
+                            required
+                          ></b-form-select>
+                          <b-form-invalid-feedback id="input-1-live-feedback">{{
+                            validationContext.errors[0]
+                          }}</b-form-invalid-feedback>
+                        </b-form-group>
+                      </validation-provider>
+                      <validation-provider
+                        name="phone number"
+                        :rules="{ required: true, min: 8 }"
+                        v-slot="validationContext"
+                      >
+                        <b-form-group label-for="input-1">
+                          <b-form-input
+                            id="input-1"
+                            v-model="form.recovery.sms.phone_number"
+                            type="number"
+                            required
+                            :state="getValidationState(validationContext)"
+                            placeholder="Enter phone number"
+                          ></b-form-input>
+                          <b-form-invalid-feedback id="input-1-live-feedback">{{
+                            validationContext.errors[0]
+                          }}</b-form-invalid-feedback>
+                        </b-form-group>
+                      </validation-provider>
+                    </div>
+                  </div>
+                  <div class="mt-5 mb-4">
+                    <b-form-checkbox
+                      name="checkbox-2"
+                      value="accepted"
+                      unchecked-value="not_accepted"
+                      @change="showByEmail = !showByEmail"
+                    >
+                      By email
+                    </b-form-checkbox>
+                  </div>
+                  <div v-if="!showByEmail">
+                    <validation-provider
+                      name="email"
+                      :rules="{ email: true, required: true }"
+                      v-slot="validationContext"
+                    >
+                      <b-form-group label="Email address:" label-for="input-1">
+                        <b-form-input
+                          id="input-1"
+                          v-model="form.recovery.email"
+                          type="email"
+                          :state="getValidationState(validationContext)"
+                          required
+                          placeholder="example@mail.ru"
+                        ></b-form-input>
+                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                          validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                      </b-form-group>
+                    </validation-provider>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-8 d-flex" v-if="isPhone">
+                <b-button
+                  @click="stepNumber--"
+                  class="back-button"
+                  variant="link"
+                  >Back</b-button
+                >
+                <b-button
+                  :disabled="invalid"
+                  class="ml-auto next-button"
+                  variant="primary"
+                  col
+                  @click="stepNumber++"
+                  >Next</b-button
+                >
+              </div>
+            </ValidationObserver>
+          </div>
+          <div v-if="stepNumber === 5">
+            <ValidationObserver v-slot="{ invalid }">
+              <div class="security-field">
+                <div class="d-flex mt-4 mb-4">
+                  <h2>Security prompt</h2>
+                  <b-icon
+                    icon="info"
+                    class="info_fade"
                     v-b-toggle="'collapse-4'"
                   />
                 </div>
+                <b-collapse id="collapse-4">
+                  <div class="d-flex info-box-animate">
+                    <div>
+                      Just click the checkbox: If you see a green checkmark,
+                      congratulations! You’ve passed our robot test (yes, it’s
+                      that easy). You can carry on with what you were doing.
+                      Sometimes we need some extra info from you to make sure
+                      you’re human and not a robot, so we ask you to solve a
+                      challenge. Simply follow the on-screen instructions to
+                      solve the puzzle and then carry on with your task.
+                    </div>
+                    <div class="boxe-close-icon">
+                      <b-icon
+                        icon="x"
+                        class="close-info-box"
+                        style="width: 26px; height: 26px;"
+                        v-b-toggle="'collapse-4'"
+                      />
+                    </div>
+                  </div>
+                </b-collapse>
+                <div>
+                  <iframe
+                    src="https://www.google.com/recaptcha/api2/anchor?ar=2&amp;k=6Lc7GmIUAAAAAKDjVWk0q9Y5HhN5bNr1ctLZDmnw&amp;co=aHR0cHM6Ly9zaWdudXAubWFpbC5jb206NDQz&amp;hl=en&amp;v=AFBwIe6h0oOL7MOVu88LHld-&amp;size=normal&amp;cb=3gu779d297kj"
+                    width="304"
+                    height="78"
+                    role="presentation"
+                    name="a-ck9nt0e8v2st"
+                    frameborder="0"
+                    scrolling="no"
+                    sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox"
+                  />
+                </div>
+                <div class="protect-field mt-4 mb-4">
+                  <b-icon
+                    icon="lock-fill"
+                    style="width: 24px; height: 24px;"
+                    class="mr-2"
+                  ></b-icon>
+                  <h2>We protect your information</h2>
+                </div>
+                <div>
+                  <div data-test="euds-body" class="mb-6">
+                    You own your information. We will only use your information
+                    to offer you the products and services you selected. Would
+                    you like to learn more? Please consult our
+                    <a target="_blank" href="#">privacy policy</a>
+                    for additional information.
+                  </div>
+                  <div class="a-mb-space-2 mb-4">
+                    <strong>
+                      The
+                      <a target="_blank" href="#">
+                        Terms and Conditions
+                      </a>
+                      apply
+                    </strong>
+                  </div>
+                </div>
               </div>
-            </b-collapse>
-            <div>
-              <iframe
-                src="https://www.google.com/recaptcha/api2/anchor?ar=2&amp;k=6Lc7GmIUAAAAAKDjVWk0q9Y5HhN5bNr1ctLZDmnw&amp;co=aHR0cHM6Ly9zaWdudXAubWFpbC5jb206NDQz&amp;hl=en&amp;v=AFBwIe6h0oOL7MOVu88LHld-&amp;size=normal&amp;cb=3gu779d297kj"
-                width="304"
-                height="78"
-                role="presentation"
-                name="a-ck9nt0e8v2st"
-                frameborder="0"
-                scrolling="no"
-                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox"
-              />
-            </div>
-            <div class="protect-field mt-4 mb-4">
-              <b-icon
-                icon="lock-fill"
-                style="width: 24px; height: 24px;"
-                class="mr-2"
-              ></b-icon>
-              <h2>We protect your information</h2>
-            </div>
-            <div>
-              <div data-test="euds-body" class="mb-6">
-                You own your information. We will only use your information to
-                offer you the products and services you selected. Would you like
-                to learn more? Please consult our
-                <a target="_blank" href="#">privacy policy</a>
-                for additional information.
+              <b-button
+                :disabled="invalid"
+                type="submit"
+                class="accept-button"
+                variant="primary"
+                >I agree. Create an email account now.</b-button
+              >
+              <div class="mt-8 d-flex" v-if="isPhone">
+                <b-button
+                  class="back-button"
+                  variant="link"
+                  @click="stepNumber--"
+                  >Back</b-button
+                >
               </div>
-              <div class="a-mb-space-2 mb-4">
-                <strong>
-                  The
-                  <a target="_blank" href="#">
-                    Terms and Conditions
-                  </a>
-                  apply
-                </strong>
-              </div>
-            </div>
-
-            <b-button type="submit" class="accept-button" variant="primary"
-              >I agree. Create an email account now.</b-button
-            >
-          </div>
-          <div class="mt-8 d-flex" v-if="isPhone">
-            <b-button
-              class="back-button"
-              variant="link"
-              v-if="stepNumber !== 1"
-              @click="stepNumber--"
-              >Back</b-button>
-            <b-button
-              class="ml-auto next-button"
-              v-if="stepNumber !== 5"
-              variant="primary"
-              col
-              @click="stepNumber++"
-              >Next</b-button
-            >
+            </ValidationObserver>
           </div>
         </b-form>
         <!--        <b-card class="mt-3" header="Form Data Result">-->
