@@ -7,11 +7,11 @@ export default {
       value: 45,
       max: 100,
       isHidden: false,
-      account: {
-        username: "",
-        domain: ""
-      },
       form: {
+        account: {
+          username: "",
+          domain: ""
+        },
         gender: "",
         first_name: "",
         last_name: "",
@@ -302,64 +302,37 @@ export default {
       stepNumber: 1,
       showByEmail: true,
       showBySms: true,
-      reg: "^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$",
+      reg: "^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$"
     };
-  },
-  methods: {
-    onSubmit(evt) {
-      evt.preventDefault();
-      alert(JSON.stringify(this.form));
-    },
   },
   computed: {
     isPhone() {
       return this.windowWidth <= 960;
-    },
-    state() {
-      return this.account.username.length >= 4 ? true : false
-    },
-    invalidFeedback() {
-      if (this.account.username.length > 4) {
-        return ''
-      } else if (this.account.username.length > 0) {
-        return 'Enter at least 4 characters'
-      } else {
-        return 'Please enter something'
-      }
-    },
-    validFeedback() {
-      return this.state === true ? 'Awesome! Your choice of email address is still available' : ''
-    },
-    firstName() {
-      return this.form.first_name.length >= 3 ? true : false
-    },
-    invalidFirstName() {
-      if (this.form.first_name.length > 3) {
-        return ''
-      } else if (this.form.first_name.length > 0) {
-        return 'Enter at least 3 characters'
-      } else {
-        return 'Please enter your first name'
-      }
-    },
-    lastName() {
-      return this.form.first_name.length >= 3 ? true : false
-    },
-    invalidLastName() {
-      if (this.form.first_name.length > 3) {
-        return ''
-      } else if (this.form.first_name.length > 0) {
-        return 'Enter at least 3 characters'
-      } else {
-        return 'Please enter your last name'
-      }
-    },
+    }
   },
   mounted() {
     window.addEventListener("resize", () => {
       this.windowWidth = window.innerWidth;
     });
   },
+  methods: {
+    getValidationState({ dirty, validated, valid = null }) {
+      return dirty || validated ? valid : null;
+    },
+    resetForm() {
+      this.form = {
+        name: null,
+        food: null
+      };
+
+      this.$nextTick(() => {
+        this.$refs.observer.reset();
+      });
+    },
+    onSubmit() {
+      alert("Form submitted!");
+    }
+  }
 };
 </script>
 
@@ -425,24 +398,27 @@ export default {
         </div>
         <b-form @submit="onSubmit">
           <div class="email-field" v-if="stepNumber == 1">
-            <b-form-group
-              id="input-group-1"
-              label-for="input-1"
-              class="email-name"
-              :invalid-feedback="invalidFeedback"
-              :valid-feedback="validFeedback"
-              :state="state"
+            <validation-provider
+              name="Name"
+              :rules="{ required: true, min: 3 }"
+              v-slot="validationContext"
             >
-              <b-form-input
-                id="input-1"
-                v-model="account.username"
-                :state="state"
-                trim
-                type="text"
-                required
-                placeholder="Enter email"
-              ></b-form-input>
-            </b-form-group>
+              <b-form-group
+                id="input-group-1"
+                label-for="input-1"
+                class="email-name"
+              >
+                <b-form-input
+                  id="input-1"
+                  v-model="form.account.username"
+                  trim
+                  type="text"
+                  :state="getValidationState(validationContext)"
+                  placeholder="Enter email"
+                ></b-form-input>
+                <b-form-invalid-feedback id="input-1-live-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+              </b-form-group>
+            </validation-provider>
             <b-form-group
               id="input-group-2"
               label-for="input-2"
@@ -450,10 +426,8 @@ export default {
             >
               <b-form-select
                 id="input-3"
-                v-model="account.domain"
+                v-model="form.account.domain"
                 :options="domains"
-                :invalid-feedback="invalidFeedback"
-                :required="sselected"
               ></b-form-select>
             </b-form-group>
             <div class="check-button">
@@ -480,15 +454,11 @@ export default {
             <b-form-group
               id="input-group-3"
               label="First Name:"
-              :invalid-feedback="invalidFirstName"
-              :state="firstName"
               label-for="input-3"
             >
               <b-form-input
                 id="input-2"
                 v-model="form.first_name"
-                :state="firstName"
-                required
                 placeholder="Enter name"
               ></b-form-input>
             </b-form-group>
@@ -496,14 +466,10 @@ export default {
               id="input-group-4"
               label="Last Name:"
               label-for="input-4"
-              :invalid-feedback="invalidLastName"
-              :state="lastName"
             >
               <b-form-input
                 id="input-2"
                 v-model="form.last_name"
-                required
-                :state="lastName"
                 placeholder="Enter name"
               ></b-form-input>
             </b-form-group>
@@ -516,7 +482,6 @@ export default {
                 id="input-3"
                 v-model="form.country"
                 :options="countries"
-                required
               ></b-form-select>
             </b-form-group>
             <b-form-group id="input-group-7" label="State" label-for="input-7">
@@ -524,7 +489,6 @@ export default {
                 id="input-3"
                 v-model="form.state"
                 :options="states"
-                required
               ></b-form-select>
             </b-form-group>
             <div>
@@ -840,7 +804,7 @@ export default {
             <b-form-group label-for="input-1" class="email-name">
               <b-form-input
                 id="input-1"
-                v-model="account.username"
+                v-model="form.account.username"
                 type="text"
                 required
                 placeholder="Enter email"
@@ -849,7 +813,7 @@ export default {
             <b-form-group label-for="input-2" class="email-domen">
               <b-form-select
                 id="input-3"
-                v-model="account.domain"
+                v-model="form.account.domain"
                 :options="domains"
                 required
               ></b-form-select>
