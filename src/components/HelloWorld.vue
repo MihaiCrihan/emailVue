@@ -1666,6 +1666,11 @@ input[type="number"] {
   .example-input {
     font-size: 14px;
   }
+  .birth-date {
+    display: grid;
+    grid-gap: 8px;
+    grid-template-columns: max-content max-content max-content;
+  }
 }
 
 /*------------------------stepper------------------------*/
