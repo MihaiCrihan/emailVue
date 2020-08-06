@@ -360,31 +360,41 @@ export default {
           class="stepper__item"
           :class="{ current: stepNumber === 1, complete: stepNumber > 1 }"
         >
-          1 of 5
+          <span>
+            1 of 5
+          </span>
         </li>
         <li
           class="stepper__item"
           :class="{ current: stepNumber === 2, complete: stepNumber > 2 }"
         >
-          2 of 5
+          <span>
+            2 of 5
+          </span>
         </li>
         <li
           class="stepper__item"
           :class="{ current: stepNumber === 3, complete: stepNumber > 3 }"
         >
-          3 of 5
+          <span>
+            3 of 5
+          </span>
         </li>
         <li
           class="stepper__item"
           :class="{ current: stepNumber === 4, complete: stepNumber > 4 }"
         >
-          4 of 5
+          <span>
+            4 of 5
+          </span>
         </li>
         <li
           class="stepper__item"
           :class="{ current: stepNumber === 5, complete: stepNumber > 5 }"
         >
-          5 of 5
+          <span>
+            5 of 5
+          </span>
         </li>
       </ul>
       <div>
@@ -484,15 +494,13 @@ export default {
                         :state="getValidationState(validationContext)"
                         value="f"
                         class="mr-4"
-                        >Ms</b-form-radio
-                      >
+                        >Ms</b-form-radio>
                       <b-form-radio
                         :state="getValidationState(validationContext)"
                         v-model="form.gender"
                         name="male"
                         value="m"
-                        >Mr</b-form-radio
-                      >
+                        >Mr</b-form-radio>
                       <b-form-invalid-feedback id="input-1-live-feedback">{{
                         validationContext.errors[0]
                       }}</b-form-invalid-feedback>
@@ -601,7 +609,7 @@ export default {
                           max="12"
                           min="1"
                         ></b-input>
-                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                        <b-form-invalid-feedback class="grid-error" id="input-1-live-feedback">{{
                           validationContext.errors[0]
                         }}</b-form-invalid-feedback>
                       </b-form-group>
@@ -622,7 +630,7 @@ export default {
                           min="1"
                           max="31"
                         ></b-input>
-                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                        <b-form-invalid-feedback class="grid-error" id="input-1-live-feedback">{{
                           validationContext.errors[0]
                         }}</b-form-invalid-feedback>
                       </b-form-group>
@@ -643,7 +651,7 @@ export default {
                           min="1900"
                           max="2020"
                         ></b-input>
-                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                        <b-form-invalid-feedback class="grid-error" id="input-1-live-feedback">{{
                           validationContext.errors[0]
                         }}</b-form-invalid-feedback>
                       </b-form-group>
@@ -719,7 +727,6 @@ export default {
                       <b-form-input
                         id="input-2"
                         v-model="form.password"
-                        required
                         :state="getValidationState(validationContext)"
                         type="password"
                         placeholder="Password"
@@ -756,7 +763,6 @@ export default {
                         v-model="form.password_repeat"
                         type="password"
                         :state="getValidationState(validationContext)"
-                        required
                       ></b-form-input>
                       <b-form-invalid-feedback id="input-1-live-feedback">{{
                         validationContext.errors[0]
@@ -844,7 +850,6 @@ export default {
                             v-model="form.recovery.sms.country.name"
                             :options="names"
                             :state="getValidationState(validationContext)"
-                            required
                           ></b-form-select>
                           <b-form-invalid-feedback id="input-1-live-feedback">{{
                             validationContext.errors[0]
@@ -861,7 +866,6 @@ export default {
                             id="input-1"
                             v-model="form.recovery.sms.phone_number"
                             type="number"
-                            required
                             :state="getValidationState(validationContext)"
                             placeholder="Enter phone number"
                           ></b-form-input>
@@ -894,7 +898,6 @@ export default {
                           v-model="form.recovery.email"
                           type="email"
                           :state="getValidationState(validationContext)"
-                          required
                           placeholder="example@mail.ru"
                         ></b-form-input>
                         <b-form-invalid-feedback id="input-1-live-feedback">{{
@@ -1058,110 +1061,202 @@ export default {
           </b-collapse>
         </div>
         <b-form @submit="onSubmit">
-          <div class="email-field">
-            <b-form-group label-for="input-1" class="email-name">
-              <b-form-input
-                id="input-1"
-                v-model="form.account.username"
-                type="text"
-                required
-                placeholder="Enter email"
-              ></b-form-input>
-            </b-form-group>
-            <b-form-group label-for="input-2" class="email-domen">
-              <b-form-select
-                id="input-3"
-                v-model="form.account.domain"
-                :options="domains"
-                required
-              ></b-form-select>
-            </b-form-group>
-            <div class="check-button">
-              <b-button class="button">Check</b-button>
+          <ValidationObserver>
+            <div class="email-field">
+              <validation-provider
+                name="Name"
+                :rules="{ required: true, min: 3 }"
+                v-slot="validationContext"
+              >
+                <b-form-group label-for="input-1" class="email-name">
+                  <b-form-input
+                    id="input-1"
+                    v-model="form.account.username"
+                    type="text"
+                    :state="getValidationState(validationContext)"
+                    placeholder="Enter email"
+                  ></b-form-input>
+                  <b-form-invalid-feedback id="input-1-live-feedback">{{
+                    validationContext.errors[0]
+                  }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+              <b-form-group label-for="input-2" class="email-domen">
+                <b-form-select
+                  id="input-3"
+                  v-model="form.account.domain"
+                  :options="domains"
+                ></b-form-select>
+              </b-form-group>
+              <div class="check-button">
+                <b-button class="button">Check</b-button>
+              </div>
             </div>
-          </div>
+          </ValidationObserver>
           <div class="personal-details-field">
             <h2>Personal details</h2>
             <div>
+              <validation-provider
+                name="Gender"
+                :rules="{ required: true }"
+                v-slot="validationContext"
+              >
               <b-form-group class="gender">
                 <b-form-radio
                   v-model="form.gender"
                   name="female"
                   value="f"
+                  :state="getValidationState(validationContext)"
                   class="mr-4"
                   >Ms</b-form-radio
                 >
-                <b-form-radio v-model="form.gender" name="male" value="m"
+                <b-form-radio
+                  v-model="form.gender"
+                  name="male"
+                  :state="getValidationState(validationContext)"
+                  value="m"
                   >Mr</b-form-radio
                 >
+                <b-form-invalid-feedback id="input-1-live-feedback">{{
+                  validationContext.errors[0]
+                  }}</b-form-invalid-feedback>
               </b-form-group>
+              </validation-provider>
             </div>
-
+            <validation-provider
+              name="first-name"
+              :rules="{ required: true, min: 3 }"
+              v-slot="validationContext"
+            >
             <b-form-group label="First Name:" label-for="input-3">
               <b-form-input
                 id="input-2"
                 v-model="form.first_name"
-                required
+                :state="getValidationState(validationContext)"
                 placeholder="Enter name"
               ></b-form-input>
+              <b-form-invalid-feedback id="input-1-live-feedback">{{
+                validationContext.errors[0]
+                }}</b-form-invalid-feedback>
             </b-form-group>
+            </validation-provider>
+            <validation-provider
+              name="last-name"
+              :rules="{ required: true, min: 3 }"
+              v-slot="validationContext"
+            >
             <b-form-group label="Last Name:" label-for="input-4">
               <b-form-input
                 id="input-2"
                 v-model="form.last_name"
-                required
+                :state="getValidationState(validationContext)"
                 placeholder="Enter name"
               ></b-form-input>
+              <b-form-invalid-feedback id="input-1-live-feedback">{{
+                validationContext.errors[0]
+                }}</b-form-invalid-feedback>
             </b-form-group>
+            </validation-provider>
+            <validation-provider
+              name="country"
+              :rules="{ required: true }"
+              v-slot="validationContext"
+            >
             <b-form-group label="Country" label-for="input-6">
               <b-form-select
                 id="input-3"
                 v-model="form.country"
+                :state="getValidationState(validationContext)"
                 :options="countries"
-                required
               ></b-form-select>
+              <b-form-invalid-feedback id="input-1-live-feedback">{{
+                validationContext.errors[0]
+                }}</b-form-invalid-feedback>
             </b-form-group>
+            </validation-provider>
+            <validation-provider
+              name="states"
+              :rules="{ required: true }"
+              v-slot="validationContext"
+            >
             <b-form-group label="State" label-for="input-7">
               <b-form-select
                 id="input-3"
                 v-model="form.state"
+                :state="getValidationState(validationContext)"
                 :options="states"
-                required
               ></b-form-select>
+              <b-form-invalid-feedback id="input-1-live-feedback">{{
+                validationContext.errors[0]
+                }}</b-form-invalid-feedback>
             </b-form-group>
+            </validation-provider>
             <div>
               <div>Date of birth</div>
               <b-form inline class="mt-3 birth-date">
-                <b-input
-                  id="inline-form-input-name"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                  placeholder="MM"
-                  type="number"
-                  v-model="form.birth.month"
-                  max="12"
-                  min="1"
-                ></b-input>
-                <b-input
-                  id="inline-form-input-name"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                  placeholder="DD"
-                  type="number"
-                  v-model="form.birth.day"
-                  maxlength="2"
-                  min="1"
-                  max="31"
-                ></b-input>
-                <b-input
-                  id="inline-form-input-name"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                  placeholder="YYYY"
-                  type="number"
-                  v-model="form.birth.year"
-                  maxlength="4"
-                  min="1900"
-                  max="2020"
-                ></b-input>
-                <div>e.g. 03/16/1997</div>
+                <validation-provider
+                  name="month"
+                  :rules="{ required: true, between: [1, 12] }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group>
+                    <b-input
+                      id="inline-form-input-name"
+                      placeholder="MM"
+                      type="number"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.birth.month"
+                      max="12"
+                      min="1"
+                    ></b-input>
+                    <b-form-invalid-feedback class="grid-error" id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                      }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <validation-provider
+                  name="day"
+                  :rules="{ required: true, between: [1, 31] }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group>
+                    <b-input
+                      id="inline-form-input-name"
+                      placeholder="DD"
+                      type="number"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.birth.day"
+                      maxlength="2"
+                      min="1"
+                      max="31"
+                    ></b-input>
+                    <b-form-invalid-feedback class="grid-error" id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                      }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <validation-provider
+                  name="year"
+                  :rules="{ required: true, between: [1900, 2020] }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group>
+                    <b-input
+                      id="inline-form-input-name"
+                      placeholder="YYYY"
+                      type="number"
+                      :state="getValidationState(validationContext)"
+                      v-model="form.birth.year"
+                      maxlength="4"
+                      min="1900"
+                      max="2020"
+                    ></b-input>
+                    <b-form-invalid-feedback class="grid-error" id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                      }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <div class="example-input">e.g. 03/16/1997</div>
               </b-form>
             </div>
           </div>
@@ -1194,33 +1289,62 @@ export default {
               </div>
             </b-collapse>
             <div>
-              <b-form-group label="Chose a password">
-                <b-form-input
-                  id="input-2"
-                  v-model="form.password"
-                  required
-                  type="password"
-                  placeholder="Password"
-                ></b-form-input>
-              </b-form-group>
+              <validation-provider
+                name="password"
+                vid="confirmation"
+                :rules="{
+                      required: true,
+                      min: 8,
+                      regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+                    }"
+                v-slot="validationContext"
+              >
+                <b-form-group label="Chose a password">
+                  <b-form-input
+                    id="input-2"
+                    v-model="form.password"
+                    :state="getValidationState(validationContext)"
+                    type="password"
+                    placeholder="Password"
+                  ></b-form-input>
+                  <b-form-invalid-feedback id="input-1-live-feedback">{{
+                    validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
               <div>
                 <b-progress height="5px" class="mt-2" :max="max">
-                  <b-progress-bar :value="value * (1.5 / 1)" variant="danger" />
                   <b-progress-bar
-                    :value="value * (2.5 / 1)"
-                    variant="warning"
+                    :value="checkStrength"
+                    :variant="
+                          checkStrength > 0 && checkStrength < 30
+                            ? 'danger'
+                            : checkStrength > 30 && checkStrength < 70
+                            ? 'warning'
+                            : checkStrength > 70 && checkStrength < 101
+                            ? 'success'
+                            : ''
+                        "
                   />
-                  <b-progress-bar :value="value * (6 / 1)" variant="success" />
                 </b-progress>
               </div>
-              <b-form-group label="Repeat a password" class="mt-3">
-                <b-form-input
-                  id="input-2"
-                  v-model="form.password_repeat"
-                  type="password"
-                  required
-                ></b-form-input>
-              </b-form-group>
+              <validation-provider
+                name="repeat-password"
+                rules="confirmed:confirmation"
+                v-slot="validationContext"
+              >
+                <b-form-group label="Repeat a password" class="mt-3">
+                  <b-form-input
+                    id="input-2"
+                    v-model="form.password_repeat"
+                    type="password"
+                    :state="getValidationState(validationContext)"
+                  ></b-form-input>
+                  <b-form-invalid-feedback id="input-1-live-feedback">{{
+                    validationContext.errors[0]
+                    }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
             </div>
           </div>
           <div class="recovery-password-field">
@@ -1266,23 +1390,41 @@ export default {
               <div v-if="!showBySms">
                 <div class="mb-2">Cellphone number</div>
                 <div class="email-field">
-                  <b-form-group id="" label-for="input-2">
-                    <b-form-select
-                      id="input-3"
-                      v-model="form.recovery.sms.country.name"
-                      :options="names"
-                      required
-                    ></b-form-select>
-                  </b-form-group>
-                  <b-form-group label-for="input-1">
-                    <b-form-input
-                      id="input-1"
-                      v-model="form.recovery.sms.phone_number"
-                      type="text"
-                      required
-                      placeholder="Enter email"
-                    ></b-form-input>
-                  </b-form-group>
+                  <validation-provider
+                    name="name"
+                    :rules="{ required: true }"
+                    v-slot="validationContext"
+                  >
+                    <b-form-group label-for="input-2">
+                      <b-form-select
+                        id="input-3"
+                        v-model="form.recovery.sms.country.name"
+                        :options="names"
+                        :state="getValidationState(validationContext)"
+                      ></b-form-select>
+                      <b-form-invalid-feedback id="input-1-live-feedback">{{
+                        validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                  <validation-provider
+                    name="phone number"
+                    :rules="{ required: true, min: 8 }"
+                    v-slot="validationContext"
+                  >
+                    <b-form-group label-for="input-1">
+                      <b-form-input
+                        id="input-1"
+                        v-model="form.recovery.sms.phone_number"
+                        type="number"
+                        :state="getValidationState(validationContext)"
+                        placeholder="Enter phone number"
+                      ></b-form-input>
+                      <b-form-invalid-feedback id="input-1-live-feedback">{{
+                        validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
                 </div>
               </div>
               <div class="mt-5 mb-4">
@@ -1296,15 +1438,24 @@ export default {
                 </b-form-checkbox>
               </div>
               <div v-if="!showByEmail">
-                <b-form-group label="Email address:" label-for="input-1">
-                  <b-form-input
-                    id="input-1"
-                    v-model="form.recovery.email"
-                    type="email"
-                    required
-                    placeholder="example@mail.ru"
-                  ></b-form-input>
-                </b-form-group>
+                <validation-provider
+                  name="email"
+                  :rules="{ email: true, required: true }"
+                  v-slot="validationContext"
+                >
+                  <b-form-group label="Email address:" label-for="input-1">
+                    <b-form-input
+                      id="input-1"
+                      v-model="form.recovery.email"
+                      type="email"
+                      :state="getValidationState(validationContext)"
+                      placeholder="example@mail.ru"
+                    ></b-form-input>
+                    <b-form-invalid-feedback id="input-1-live-feedback">{{
+                      validationContext.errors[0]
+                      }}</b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
               </div>
             </div>
           </div>
@@ -1432,7 +1583,10 @@ a {
 .birth-date {
   display: grid;
   grid-gap: 8px;
-  grid-template-columns: 62px 62px 74px auto;
+  grid-template-columns: min-content min-content min-content auto;
+}
+.grid-error {
+  position: absolute;
 }
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
