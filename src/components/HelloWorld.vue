@@ -1695,7 +1695,7 @@ input[type="number"] {
 
 .stepper__item {
   flex: 100%;
-  padding: 5px 20px 20px 40px;
+  padding: 5px 5px 0px 25px;
   background: #f0f4f8;
   margin: 0 0 0 -19px;
   color: #f0f4f8;
